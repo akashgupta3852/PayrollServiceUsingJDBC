@@ -13,6 +13,17 @@ import java.util.Enumeration;
 import java.util.List;
 
 public class EmployeePayrollDBService {
+	private PreparedStatement employeePayrollDataStatement;
+	private static EmployeePayrollDBService employeePayrollDBService;
+
+	private EmployeePayrollDBService() {
+	}
+
+	public static EmployeePayrollDBService getInstance() {
+		if (employeePayrollDBService == null)
+			employeePayrollDBService = new EmployeePayrollDBService();
+		return employeePayrollDBService;
+	}
 
 	public void printWelcome() {
 		System.out.println("Welcome to Payroll Services Problem");
@@ -26,7 +37,7 @@ public class EmployeePayrollDBService {
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			connection = DriverManager.getConnection(jdbcURL, username, password);
-	        listDrivers();
+			listDrivers();
 		} catch (SQLException e) {
 			throw new CustomException("Data is insufficient");
 		} catch (ClassNotFoundException e) {
@@ -37,7 +48,7 @@ public class EmployeePayrollDBService {
 
 	private void listDrivers() {
 		Enumeration<Driver> driverList = DriverManager.getDrivers();
-		while(driverList.hasMoreElements()) {
+		while (driverList.hasMoreElements()) {
 			Driver driverClass = (Driver) driverList.nextElement();
 		}
 	}
@@ -54,10 +65,11 @@ public class EmployeePayrollDBService {
 	}
 
 	public List<EmployeePayrollData> getEmployeePayrollData(String name) throws CustomException {
-		String sql = "SELECT * FROM employee_payroll where name = '" + name + "';";
 		try {
-			Statement statement = this.getConnection().createStatement();
-			ResultSet resultSet = statement.executeQuery(sql);
+			String sql = "SELECT * FROM employee_payroll where name = ?";
+			employeePayrollDataStatement = this.getConnection().prepareStatement(sql);
+			employeePayrollDataStatement.setString(1, name);
+			ResultSet resultSet = employeePayrollDataStatement.executeQuery();
 			return this.getEmployeePayrollData(resultSet);
 		} catch (SQLException e) {
 			throw new CustomException("Data is insufficient");
@@ -93,18 +105,18 @@ public class EmployeePayrollDBService {
 			throw new CustomException("Data is insufficient");
 		}
 	}
-	
+
 	public int updateEmployeeData(double salary, String name) throws CustomException {
-		return this.updateEmployeeDataUsingPreparedStatement(salary,name);
+		return this.updateEmployeeDataUsingPreparedStatement(salary, name);
 	}
-	
+
 	private int updateEmployeeDataUsingPreparedStatement(double salary, String name) throws CustomException {
 		String sql = "update employee_payroll set salary = ? where name = ?";
 		try {
-			PreparedStatement preparedStatement = this.getConnection().prepareStatement(sql);
-			preparedStatement.setDouble(1, salary);
-			preparedStatement.setString(2, name);
-			return preparedStatement.executeUpdate();
+			employeePayrollDataStatement = this.getConnection().prepareStatement(sql);
+			employeePayrollDataStatement.setDouble(1, salary);
+			employeePayrollDataStatement.setString(2, name);
+			return employeePayrollDataStatement.executeUpdate();
 		} catch (SQLException e) {
 			throw new CustomException("Data is insufficient");
 		}
