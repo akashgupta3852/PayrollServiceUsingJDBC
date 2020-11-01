@@ -1,5 +1,6 @@
 package com.bridgelabz.employeepayrollserviceusingjdbc;
 
+import java.sql.Date;
 import java.util.List;
 
 import org.junit.Assert;
@@ -14,7 +15,7 @@ public class EmployeePayrollServiceTest {
 				.readEmployeePayrollData(EmployeePayrollService.IOService.DB_IO);
 		Assert.assertEquals(3, employeePayrollList.size());
 	}
-	
+
 	@Test
 	public void givenNewSalaryForEmployee_WhenUpdated_ShouldSyncWithDB() throws CustomException {
 		EmployeePayrollService employeePayrollService = new EmployeePayrollService();
@@ -23,7 +24,7 @@ public class EmployeePayrollServiceTest {
 		boolean result = employeePayrollService.checkEmployeePayrollInSyncWithDB("Terisa");
 		Assert.assertTrue(result);
 	}
-	
+
 	@Test
 	public void givenNewSalaryForEmployee_WhenUpdatedUsingPreparedStatement_ShouldSyncWithDB() throws CustomException {
 		EmployeePayrollService employeePayrollService = new EmployeePayrollService();
@@ -31,5 +32,13 @@ public class EmployeePayrollServiceTest {
 		employeePayrollService.updateEmployeeSalaryUsingPreparedStatement("Terisa", 3000000.00);
 		boolean result = employeePayrollService.checkEmployeePayrollInSyncWithDB("Terisa");
 		Assert.assertTrue(result);
+	}
+
+	@Test
+	public void givenEmployeePayrolInDB_WhenRetrievedAllEmployeesWhoJoinedInAParticularDateRange_ShouldMatchEmployeeCount()
+			throws CustomException {
+		EmployeePayrollService employeePayrollService = new EmployeePayrollService();
+		List<EmployeePayrollData> employeePayrollList = employeePayrollService.findEmployeeByDateRange("2019-01-01","2020-12-31");
+		Assert.assertEquals(2, employeePayrollList.size());
 	}
 }

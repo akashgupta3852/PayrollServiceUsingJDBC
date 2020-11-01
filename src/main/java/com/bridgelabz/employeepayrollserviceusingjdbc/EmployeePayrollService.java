@@ -1,5 +1,6 @@
 package com.bridgelabz.employeepayrollserviceusingjdbc;
 
+import java.sql.Date;
 import java.util.List;
 
 public class EmployeePayrollService {
@@ -53,5 +54,9 @@ public class EmployeePayrollService {
 	public boolean checkEmployeePayrollInSyncWithDB(String name) throws CustomException {
 		List<EmployeePayrollData> employeePayrollList = employeePayrollDBService.getEmployeePayrollData(name);
 		return employeePayrollList.get(0).equals(getEmployeePayrollData(name));
+	}
+
+	public List<EmployeePayrollData> findEmployeeByDateRange(String fromDate, String toDate) throws CustomException {
+		return employeePayrollDBService.findEmployeeByDateRange(fromDate, toDate);
 	}
 }

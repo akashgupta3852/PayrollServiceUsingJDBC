@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -117,6 +118,19 @@ public class EmployeePayrollDBService {
 			employeePayrollDataStatement.setDouble(1, salary);
 			employeePayrollDataStatement.setString(2, name);
 			return employeePayrollDataStatement.executeUpdate();
+		} catch (SQLException e) {
+			throw new CustomException("Data is insufficient");
+		}
+	}
+
+	public List<EmployeePayrollData> findEmployeeByDateRange(String fromDate, String toDate) throws CustomException {
+		String sql = "select * from employee_payroll where start between Cast(? as Date) and Cast(? as Date)";
+		try {
+			employeePayrollDataStatement = this.getConnection().prepareStatement(sql);
+			employeePayrollDataStatement.setString(1, fromDate);
+			employeePayrollDataStatement.setString(2, toDate);
+			ResultSet resultSet = employeePayrollDataStatement.executeQuery();
+			return this.getEmployeePayrollData(resultSet);
 		} catch (SQLException e) {
 			throw new CustomException("Data is insufficient");
 		}
