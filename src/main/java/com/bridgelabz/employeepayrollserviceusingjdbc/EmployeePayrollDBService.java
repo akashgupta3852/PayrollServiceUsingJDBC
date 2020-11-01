@@ -7,7 +7,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -83,9 +82,10 @@ public class EmployeePayrollDBService {
 			while (resultSet.next()) {
 				int empId = resultSet.getInt("id");
 				String empName = resultSet.getString("name");
+				String empGender = resultSet.getString("gender");
 				double salary = resultSet.getDouble("salary");
 				LocalDate startDate = resultSet.getDate("start").toLocalDate();
-				employeePayrollList.add(new EmployeePayrollData(empId, empName, salary, startDate));
+				employeePayrollList.add(new EmployeePayrollData(empId, empName, empGender, salary, startDate));
 			}
 			return employeePayrollList;
 		} catch (SQLException e) {
@@ -131,6 +131,71 @@ public class EmployeePayrollDBService {
 			employeePayrollDataStatement.setString(2, toDate);
 			ResultSet resultSet = employeePayrollDataStatement.executeQuery();
 			return this.getEmployeePayrollData(resultSet);
+		} catch (SQLException e) {
+			throw new CustomException("Data is insufficient");
+		}
+	}
+
+	public double findMaxSalaryByGender(String gender) throws CustomException {
+		String sql = "SELECT GENDER, MAX(SALARY) AS MAXIMUM_SALARY FROM EMPLOYEE_PAYROLL WHERE GENDER = ? GROUP BY GENDER;";
+		try {
+			employeePayrollDataStatement = this.getConnection().prepareStatement(sql);
+			employeePayrollDataStatement.setString(1, gender);
+			ResultSet resultSet = employeePayrollDataStatement.executeQuery();
+			resultSet.next();
+			return resultSet.getInt("MAXIMUM_SALARY");
+		} catch (SQLException e) {
+			throw new CustomException("Data is insufficient");
+		}
+	}
+
+	public double findMinSalaryByGender(String gender) throws CustomException {
+		String sql = "SELECT GENDER, MIN(SALARY) AS MINIMUM_SALARY FROM EMPLOYEE_PAYROLL WHERE GENDER = ? GROUP BY GENDER;";
+		try {
+			employeePayrollDataStatement = this.getConnection().prepareStatement(sql);
+			employeePayrollDataStatement.setString(1, gender);
+			ResultSet resultSet = employeePayrollDataStatement.executeQuery();
+			resultSet.next();
+			return resultSet.getInt("MINIMUM_SALARY");
+		} catch (SQLException e) {
+			throw new CustomException("Data is insufficient");
+		}
+	}
+
+	public double calculateTotalSalaryByGender(String gender) throws CustomException {
+		String sql = "select gender, sum(salary) as totalSalary from PAYROLL_SERVICES.employee_payroll where gender = ? group by gender;";
+		try {
+			employeePayrollDataStatement = this.getConnection().prepareStatement(sql);
+			employeePayrollDataStatement.setString(1, gender);
+			ResultSet resultSet = employeePayrollDataStatement.executeQuery();
+			resultSet.next();
+			return resultSet.getDouble("totalSalary");
+		} catch (SQLException e) {
+			throw new CustomException("Data is insufficient");
+		}
+	}
+
+	public int countByGender(String gender) throws CustomException {
+		String sql = "SELECT GENDER, COUNT(NAME) AS TOTAL_SALARY FROM EMPLOYEE_PAYROLL WHERE GENDER = ? GROUP BY GENDER;";
+		try {
+			employeePayrollDataStatement = this.getConnection().prepareStatement(sql);
+			employeePayrollDataStatement.setString(1, gender);
+			ResultSet resultSet = employeePayrollDataStatement.executeQuery();
+			resultSet.next();
+			return resultSet.getInt("TOTAL_SALARY");
+		} catch (SQLException e) {
+			throw new CustomException("Data is insufficient");
+		}
+	}
+
+	public double findAvgSalaryByGender(String gender) throws CustomException {
+		String sql = "SELECT GENDER, AVG(SALARY) AS AVERAGE_SALARY FROM EMPLOYEE_PAYROLL WHERE GENDER = ? GROUP BY GENDER;";
+		try {
+			employeePayrollDataStatement = this.getConnection().prepareStatement(sql);
+			employeePayrollDataStatement.setString(1, gender);
+			ResultSet resultSet = employeePayrollDataStatement.executeQuery();
+			resultSet.next();
+			return resultSet.getInt("AVERAGE_SALARY");
 		} catch (SQLException e) {
 			throw new CustomException("Data is insufficient");
 		}

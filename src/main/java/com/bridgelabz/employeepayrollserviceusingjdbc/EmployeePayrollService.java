@@ -59,4 +59,24 @@ public class EmployeePayrollService {
 	public List<EmployeePayrollData> findEmployeeByDateRange(String fromDate, String toDate) throws CustomException {
 		return employeePayrollDBService.findEmployeeByDateRange(fromDate, toDate);
 	}
+
+	public double findMaxSalaryByGender(String gender) throws CustomException {
+		return employeePayrollDBService.findMaxSalaryByGender(gender);
+	}
+
+	public double findMinSalaryByGender(String gender) throws CustomException {
+		return employeePayrollDBService.findMinSalaryByGender(gender);
+	}
+
+	public double calculateTotalSalaryByGender(String gender) throws CustomException {
+		return employeePayrollDBService.calculateTotalSalaryByGender(gender);
+	}
+
+	public int countByGender(String gender) throws CustomException {
+		return employeePayrollDBService.countByGender(gender);
+	}
+
+	public double findAvgSalaryByGender(String gender) throws CustomException {
+		return employeePayrollDBService.findAvgSalaryByGender(gender);
+	}
 }
