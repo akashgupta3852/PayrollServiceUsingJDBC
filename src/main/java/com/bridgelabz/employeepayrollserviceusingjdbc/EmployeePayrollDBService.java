@@ -3,6 +3,7 @@ package com.bridgelabz.employeepayrollserviceusingjdbc;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -88,6 +89,22 @@ public class EmployeePayrollDBService {
 		try {
 			Statement statement = this.getConnection().createStatement();
 			return statement.executeUpdate(sql);
+		} catch (SQLException e) {
+			throw new CustomException("Data is insufficient");
+		}
+	}
+	
+	public int updateEmployeeData(double salary, String name) throws CustomException {
+		return this.updateEmployeeDataUsingPreparedStatement(salary,name);
+	}
+	
+	private int updateEmployeeDataUsingPreparedStatement(double salary, String name) throws CustomException {
+		String sql = "update employee_payroll set salary = ? where name = ?";
+		try {
+			PreparedStatement preparedStatement = this.getConnection().prepareStatement(sql);
+			preparedStatement.setDouble(1, salary);
+			preparedStatement.setString(2, name);
+			return preparedStatement.executeUpdate();
 		} catch (SQLException e) {
 			throw new CustomException("Data is insufficient");
 		}

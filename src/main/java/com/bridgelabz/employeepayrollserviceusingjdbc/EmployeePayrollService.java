@@ -30,6 +30,15 @@ public class EmployeePayrollService {
 			employeePayrollData.salary = salary;
 		}
 	}
+	
+	public void updateEmployeeSalaryUsingPreparedStatement(String name, double salary) throws CustomException {
+		int result = employeePayrollDBService.updateEmployeeData(salary,name);
+		if(result == 0) return;
+		EmployeePayrollData employeePayrollData = this.getEmployeePayrollData(name);
+		if(employeePayrollData != null) {
+			employeePayrollData.salary = salary;
+		}
+	}
 
 	private EmployeePayrollData getEmployeePayrollData(String name) {
 		return this.employeePayrollList.stream()
