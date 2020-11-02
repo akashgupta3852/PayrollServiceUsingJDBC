@@ -200,4 +200,19 @@ public class EmployeePayrollDBService {
 			throw new CustomException("Data is insufficient");
 		}
 	}
+
+	public int addEmployeeToPayrollData(String name, String gender, Double salary, String startDate)
+			throws CustomException {
+		String sql = "insert into employee_payroll (name, gender, salary, start) values (?,?,?,Cast(? as Date))";
+		try {
+			employeePayrollDataStatement = this.getConnection().prepareStatement(sql);
+			employeePayrollDataStatement.setString(1, name);
+			employeePayrollDataStatement.setString(2, gender);
+			employeePayrollDataStatement.setDouble(3, salary);
+			employeePayrollDataStatement.setString(4, startDate);
+			return employeePayrollDataStatement.executeUpdate();
+		} catch (SQLException e) {
+			throw new CustomException("Data is already present for " + name);
+		}
+	}
 }

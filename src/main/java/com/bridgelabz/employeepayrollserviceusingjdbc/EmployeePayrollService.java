@@ -1,6 +1,6 @@
 package com.bridgelabz.employeepayrollserviceusingjdbc;
 
-import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 public class EmployeePayrollService {
@@ -13,6 +13,7 @@ public class EmployeePayrollService {
 
 	public EmployeePayrollService() {
 		employeePayrollDBService = EmployeePayrollDBService.getInstance();
+		employeePayrollList = new ArrayList<>();
 	}
 
 	public EmployeePayrollService(List<EmployeePayrollData> employeePayrollList) {
@@ -78,5 +79,10 @@ public class EmployeePayrollService {
 
 	public double findAvgSalaryByGender(String gender) throws CustomException {
 		return employeePayrollDBService.findAvgSalaryByGender(gender);
+	}
+
+	public void addEmployeeToPayrollData(String name, String gender, Double salary, String startDate)
+			throws CustomException {
+		employeePayrollDBService.addEmployeeToPayrollData(name, gender, salary, startDate);
 	}
 }

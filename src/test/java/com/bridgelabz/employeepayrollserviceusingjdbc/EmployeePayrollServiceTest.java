@@ -14,38 +14,37 @@ public class EmployeePayrollServiceTest {
 	}
 
 	@Test
-	public void givenEmployeePayrolInDB_WhenRetrieved_ShouldMatchEmployeeCount() throws CustomException {
+	public void givenEmployeePayrollInDB_WhenRetrieved_ShouldMatchEmployeeCount() throws CustomException {
 		List<EmployeePayrollData> employeePayrollList = employeePayrollService
 				.readEmployeePayrollData(EmployeePayrollService.IOService.DB_IO);
-		Assert.assertEquals(3, employeePayrollList.size());
+		Assert.assertEquals(4, employeePayrollList.size());
 	}
 
 	@Test
 	public void givenNewSalaryForEmployee_WhenUpdated_ShouldSyncWithDB() throws CustomException {
-		employeePayrollService.readEmployeePayrollData(EmployeePayrollService.IOService.DB_IO);
 		employeePayrollService.updateEmployeeSalary("Terisa", 3000000.00);
+		employeePayrollService.readEmployeePayrollData(EmployeePayrollService.IOService.DB_IO);
 		boolean result = employeePayrollService.checkEmployeePayrollInSyncWithDB("Terisa");
 		Assert.assertTrue(result);
 	}
 
 	@Test
 	public void givenNewSalaryForEmployee_WhenUpdatedUsingPreparedStatement_ShouldSyncWithDB() throws CustomException {
-		employeePayrollService.readEmployeePayrollData(EmployeePayrollService.IOService.DB_IO);
 		employeePayrollService.updateEmployeeSalaryUsingPreparedStatement("Terisa", 3000000.00);
+		employeePayrollService.readEmployeePayrollData(EmployeePayrollService.IOService.DB_IO);
 		boolean result = employeePayrollService.checkEmployeePayrollInSyncWithDB("Terisa");
 		Assert.assertTrue(result);
 	}
 
 	@Test
-	public void givenEmployeePayrolInDB_WhenRetrievedAllEmployeesWhoJoinedInAParticularDateRange_ShouldMatchEmployeeCount()
-			throws CustomException {
+	public void givenDateRange_WhenRetrieved_ShouldMatchEmployeeCount() throws CustomException {
 		List<EmployeePayrollData> employeePayrollList = employeePayrollService.findEmployeeByDateRange("2019-01-01",
-				"2020-12-31");
+				"2020-10-31");
 		Assert.assertEquals(2, employeePayrollList.size());
 	}
 
 	@Test
-	public void givenEmployeePayrolInDB_WhenRetrievedForMaxSalaryByGender_ShouldMatch() throws CustomException {
+	public void givenPayrollData_WhenMaxSalaryRetrievedByGender_ShouldReturnProperValue() throws CustomException {
 		double maxSalaryofMale = employeePayrollService.findMaxSalaryByGender("M");
 		double maxSalaryofFemale = employeePayrollService.findMaxSalaryByGender("F");
 		boolean result = (maxSalaryofMale == 3000000) && (maxSalaryofFemale == 3000000);
@@ -53,7 +52,7 @@ public class EmployeePayrollServiceTest {
 	}
 
 	@Test
-	public void givenEmployeePayrolInDB_WhenRetrievedForMinSalaryByGender_ShouldMatch() throws CustomException {
+	public void givenPayrollData_WhenMinSalaryRetrievedByGender_ShouldReturnProperValue() throws CustomException {
 		double minSalaryofMale = employeePayrollService.findMinSalaryByGender("M");
 		double minSalaryofFemale = employeePayrollService.findMinSalaryByGender("F");
 		boolean result = (minSalaryofMale == 1000000) && (minSalaryofFemale == 3000000);
@@ -61,26 +60,28 @@ public class EmployeePayrollServiceTest {
 	}
 
 	@Test
-	public void givenEmployeePayrolInDB_WhenRetrievedForSumOfSalaryByGender_ShouldMatch() throws CustomException {
-		double salaryofMale = employeePayrollService.calculateTotalSalaryByGender("M");
+	public void givenPayrollData_WhenTotalSalaryRetrievedByGender_ShouldReturnProperValue() throws CustomException {
 		double salaryofFemale = employeePayrollService.calculateTotalSalaryByGender("F");
-		boolean result = (salaryofMale == 4000000) && (salaryofFemale == 3000000);
-		Assert.assertTrue(result);
+		Assert.assertEquals(3000000, salaryofFemale, 0.00);
 	}
 
 	@Test
-	public void givenEmployeePayrolInDB_WhenRetrievedForCountByGender_ShouldMatch() throws CustomException {
-		int noOfMale = employeePayrollService.countByGender("M");
+	public void givenPayrollData_WhenTotalCountRetrievedByGender_ShouldReturnProperValue() throws CustomException {
 		int noOfFemale = employeePayrollService.countByGender("F");
-		boolean result = (noOfMale == 2) && (noOfFemale == 1);
-		Assert.assertTrue(result);
+		Assert.assertEquals(1, noOfFemale);
 	}
 
 	@Test
-	public void givenEmployeePayrolInDB_WhenRetrievedForAvgSalaryByGender_ShouldMatch() throws CustomException {
-		double avgSalaryofMale = employeePayrollService.findAvgSalaryByGender("M");
+	public void givenPayrollData_WhenAverageSalaryRetrievedByGender_ShouldReturnProperValue() throws CustomException {
 		double avgSalaryofFemale = employeePayrollService.findAvgSalaryByGender("F");
-		boolean result = (avgSalaryofMale == 2000000) && (avgSalaryofFemale == 3000000);
+		Assert.assertEquals(3000000, avgSalaryofFemale, 0.00);
+	}
+
+	@Test
+	public void givenNewEmployee_WhenAdded_ShouldBeSyncWithDB() throws CustomException {
+		employeePayrollService.addEmployeeToPayrollData("Mark", "M", 1500000.00, "2020-11-02");
+		employeePayrollService.readEmployeePayrollData(EmployeePayrollService.IOService.DB_IO);
+		boolean result = employeePayrollService.checkEmployeePayrollInSyncWithDB("Mark");
 		Assert.assertTrue(result);
 	}
 }
