@@ -17,7 +17,7 @@ public class EmployeePayrollServiceTest {
 	public void givenEmployeePayrollInDB_WhenRetrieved_ShouldMatchEmployeeCount() throws CustomException {
 		List<EmployeePayrollData> employeePayrollList = employeePayrollService
 				.readEmployeePayrollData(EmployeePayrollService.IOService.DB_IO);
-		Assert.assertEquals(4, employeePayrollList.size());
+		Assert.assertEquals(5, employeePayrollList.size());
 	}
 
 	@Test
@@ -45,18 +45,14 @@ public class EmployeePayrollServiceTest {
 
 	@Test
 	public void givenPayrollData_WhenMaxSalaryRetrievedByGender_ShouldReturnProperValue() throws CustomException {
-		double maxSalaryofMale = employeePayrollService.findMaxSalaryByGender("M");
 		double maxSalaryofFemale = employeePayrollService.findMaxSalaryByGender("F");
-		boolean result = (maxSalaryofMale == 3000000) && (maxSalaryofFemale == 3000000);
-		Assert.assertTrue(result);
+		Assert.assertEquals(3000000, maxSalaryofFemale, 0.00);
 	}
 
 	@Test
 	public void givenPayrollData_WhenMinSalaryRetrievedByGender_ShouldReturnProperValue() throws CustomException {
-		double minSalaryofMale = employeePayrollService.findMinSalaryByGender("M");
 		double minSalaryofFemale = employeePayrollService.findMinSalaryByGender("F");
-		boolean result = (minSalaryofMale == 1000000) && (minSalaryofFemale == 3000000);
-		Assert.assertTrue(result);
+		Assert.assertEquals(3000000, minSalaryofFemale, 0.00);
 	}
 
 	@Test
@@ -80,6 +76,14 @@ public class EmployeePayrollServiceTest {
 	@Test
 	public void givenNewEmployee_WhenAdded_ShouldBeSyncWithDB() throws CustomException {
 		employeePayrollService.addEmployeeToPayrollData("Mark", "M", 1500000.00, "2020-11-02");
+		employeePayrollService.readEmployeePayrollData(EmployeePayrollService.IOService.DB_IO);
+		boolean result = employeePayrollService.checkEmployeePayrollInSyncWithDB("Mark");
+		Assert.assertTrue(result);
+	}
+
+	@Test
+	public void givenNewPayrollData_WhenAddedToThePayrollDetails_ShouldBeSyncWithDB() throws CustomException {
+		employeePayrollService.addEmployeeToPayrollData("Akash", "M", 4000000.00, "2020-11-01");
 		employeePayrollService.readEmployeePayrollData(EmployeePayrollService.IOService.DB_IO);
 		boolean result = employeePayrollService.checkEmployeePayrollInSyncWithDB("Mark");
 		Assert.assertTrue(result);

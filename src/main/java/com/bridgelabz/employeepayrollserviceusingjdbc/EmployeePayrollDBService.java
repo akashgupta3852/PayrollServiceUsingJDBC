@@ -210,9 +210,45 @@ public class EmployeePayrollDBService {
 			employeePayrollDataStatement.setString(2, gender);
 			employeePayrollDataStatement.setDouble(3, salary);
 			employeePayrollDataStatement.setString(4, startDate);
-			return employeePayrollDataStatement.executeUpdate();
+			int count = employeePayrollDataStatement.executeUpdate();
+			int id = getEmployeeID(name);
+			addPayrollDataToPayrollDetails(id, salary);
+			return count;
 		} catch (SQLException e) {
 			throw new CustomException("Data is already present for " + name);
+		}
+	}
+
+	private int getEmployeeID(String name) throws CustomException {
+		try {
+			String sql = "SELECT id FROM employee_payroll where name = ?";
+			employeePayrollDataStatement = this.getConnection().prepareStatement(sql);
+			employeePayrollDataStatement.setString(1, name);
+			ResultSet resultSet = employeePayrollDataStatement.executeQuery();
+			resultSet.next();
+			return resultSet.getInt("id");
+		} catch (SQLException e) {
+			throw new CustomException("Data is insufficient");
+		}
+
+	}
+
+	private void addPayrollDataToPayrollDetails(int id, Double salary) throws CustomException {
+		String sql = "insert into payroll_details (id, deductions, taxable_pay, tax, net_pay) values (?,?,?,?,?)";
+		try {
+			employeePayrollDataStatement = this.getConnection().prepareStatement(sql);
+			employeePayrollDataStatement.setInt(1, id);
+			double deductions = 0.2 * salary;
+			employeePayrollDataStatement.setDouble(2, deductions);
+			double taxable_pay = salary - deductions;
+			employeePayrollDataStatement.setDouble(3, taxable_pay);
+			double tax = 0.1 * taxable_pay;
+			employeePayrollDataStatement.setDouble(4, tax);
+			double net_pay = salary - tax;
+			employeePayrollDataStatement.setDouble(5, net_pay);
+			employeePayrollDataStatement.executeUpdate();
+		} catch (SQLException e) {
+			throw new CustomException("Unable to add the payroll details");
 		}
 	}
 }
