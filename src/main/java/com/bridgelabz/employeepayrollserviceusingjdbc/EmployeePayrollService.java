@@ -83,6 +83,6 @@ public class EmployeePayrollService {
 
 	public void addEmployeeToPayrollData(String name, String gender, Double salary, String startDate)
 			throws CustomException {
-		employeePayrollDBService.addEmployeeToPayrollData(name, gender, salary, startDate);
+		employeePayrollList.add(employeePayrollDBService.addEmployeeToPayrollData(name, gender, salary, startDate));
 	}
 }
