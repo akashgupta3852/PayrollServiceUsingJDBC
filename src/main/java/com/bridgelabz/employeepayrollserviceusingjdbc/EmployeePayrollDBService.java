@@ -289,4 +289,16 @@ public class EmployeePayrollDBService {
 			throw new CustomException("Unable to add the payroll table");
 		}
 	}
+
+	public int deleteEmployeeFromPayroll(String name, boolean isActive) throws CustomException {
+		String sql = "update employee_payroll set is_active = ? where name = ?";
+		try (Connection connection = this.getConnection()) {
+			employeePayrollDataStatement = connection.prepareStatement(sql);
+			employeePayrollDataStatement.setBoolean(1, isActive);
+			employeePayrollDataStatement.setString(2, name);
+			return employeePayrollDataStatement.executeUpdate();
+		} catch (SQLException e) {
+			throw new CustomException("Unable to delete");
+		}
+	}
 }

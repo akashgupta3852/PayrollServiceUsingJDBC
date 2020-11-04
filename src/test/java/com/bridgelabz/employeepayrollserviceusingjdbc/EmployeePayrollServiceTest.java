@@ -82,9 +82,19 @@ public class EmployeePayrollServiceTest {
 					"2020-11-01");
 			boolean result = employeePayrollService.checkEmployeePayrollInSyncWithDB("Mark");
 			Assert.assertTrue(result);
-			System.out.println(result);
 		} catch (CustomException e) {
 		}
 	}
 
+	@Test
+	public void givenEmployee_WhenDeletedFromPayroll_ShouldBeRemovedFromEmployeeList() {
+		try {
+			employeePayrollService.readEmployeePayrollData(EmployeePayrollService.IOService.DB_IO);
+			List<EmployeePayrollData> employeePayrollList = employeePayrollService.deleteEmployeeFromPayroll("Terisa",
+					false);
+			Assert.assertEquals(3, employeePayrollList.size());
+		} catch (CustomException e) {
+			e.printStackTrace();
+		}
+	}
 }

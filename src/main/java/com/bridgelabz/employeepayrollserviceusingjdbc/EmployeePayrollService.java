@@ -86,4 +86,17 @@ public class EmployeePayrollService {
 		employeePayrollList.add(employeePayrollDBService.addEmployeeToPayrollData(name, gender, compId, compName,
 				depName, salary, startDate));
 	}
+
+	public List<EmployeePayrollData> deleteEmployeeFromPayroll(String name, boolean isActive) throws CustomException {
+		int rowsAffected = employeePayrollDBService.deleteEmployeeFromPayroll(name, isActive);
+		if (rowsAffected == 1) {
+			for (EmployeePayrollData empData : employeePayrollList) {
+				if (empData.name.equals(name)) {
+					employeePayrollList.remove(empData);
+					break;
+				}
+			}
+		}
+		return employeePayrollList;
+	}
 }
