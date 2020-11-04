@@ -1,5 +1,6 @@
 package com.bridgelabz.employeepayrollserviceusingjdbc;
 
+import java.sql.Array;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
@@ -85,9 +86,10 @@ public class EmployeePayrollDBService {
 				int empId = resultSet.getInt("id");
 				String empName = resultSet.getString("name");
 				String empGender = resultSet.getString("gender");
+				int compId = resultSet.getInt("compId");
 				double salary = resultSet.getDouble("salary");
 				LocalDate startDate = resultSet.getDate("start").toLocalDate();
-				employeePayrollList.add(new EmployeePayrollData(empId, empName, empGender, salary, startDate));
+				employeePayrollList.add(new EmployeePayrollData(empId, empName, empGender, compId, salary, startDate));
 			}
 			return employeePayrollList;
 		} catch (SQLException e) {
@@ -203,8 +205,8 @@ public class EmployeePayrollDBService {
 		}
 	}
 
-	public EmployeePayrollData addEmployeeToPayrollData(String name, String gender, Double salary, String startDate)
-			throws CustomException {
+	public EmployeePayrollData addEmployeeToPayrollData(String name, String gender, int compId, String compName,
+			Object[] depName, Double salary, String startDate) throws CustomException {
 		Connection connection = this.getConnection();
 		try {
 			connection.setAutoCommit(false);
@@ -212,12 +214,15 @@ public class EmployeePayrollDBService {
 			e.printStackTrace();
 		}
 		try {
-			String sql = "insert into employee_payroll (name, gender, salary, start) values (?,?,?,Cast(? as Date))";
+			String sql = "insert into employee_payroll (name, gender, compId, depName, salary, start) values (?,?,?,?,?,Cast(? as Date))";
 			employeePayrollDataStatement = connection.prepareStatement(sql);
+			Array array = connection.createArrayOf("VARCHAR", depName);
 			employeePayrollDataStatement.setString(1, name);
 			employeePayrollDataStatement.setString(2, gender);
-			employeePayrollDataStatement.setDouble(3, salary);
-			employeePayrollDataStatement.setString(4, startDate);
+			employeePayrollDataStatement.setInt(3, compId);
+			employeePayrollDataStatement.setArray(4, array);
+			employeePayrollDataStatement.setDouble(5, salary);
+			employeePayrollDataStatement.setString(6, startDate);
 			employeePayrollDataStatement.executeUpdate();
 			String query = "SELECT id FROM employee_payroll where name = ?";
 			employeePayrollDataStatement = connection.prepareStatement(query);
@@ -225,10 +230,12 @@ public class EmployeePayrollDBService {
 			ResultSet resultSet = employeePayrollDataStatement.executeQuery();
 			resultSet.next();
 			int id = resultSet.getInt("id");
-			addPayrollDataToPayrollDetails(id, salary, connection);
-			return new EmployeePayrollData(id, name, gender, salary,
+			addDataToPayrollTable(id, salary, connection);
+			addDataToCompanyTble(compId, compName, connection);
+			return new EmployeePayrollData(id, name, gender, compId, compName, depName, salary,
 					LocalDate.parse(startDate, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
 		} catch (SQLException e) {
+			e.printStackTrace();
 			throw new CustomException("Data is already present for " + name);
 		} finally {
 			try {
@@ -239,7 +246,25 @@ public class EmployeePayrollDBService {
 		}
 	}
 
-	private void addPayrollDataToPayrollDetails(int id, Double salary, Connection connection) throws CustomException {
+	private void addDataToCompanyTble(int compId, String compName, Connection connection) throws CustomException {
+		String sql = "insert into company_name (company_id, company_name) values (?,?)";
+		try {
+			employeePayrollDataStatement = connection.prepareStatement(sql);
+			employeePayrollDataStatement.setInt(1, compId);
+			employeePayrollDataStatement.setString(2, compName);
+			employeePayrollDataStatement.executeUpdate();
+			connection.commit();
+		} catch (SQLException e) {
+			try {
+				connection.rollback();
+			} catch (SQLException exception) {
+				e.printStackTrace();
+			}
+			throw new CustomException("Unable to add the company table");
+		}
+	}
+
+	private void addDataToPayrollTable(int id, Double salary, Connection connection) throws CustomException {
 		String sql = "insert into payroll_details (id, basic_pay, deductions, taxable_pay, tax, net_pay) values (?,?,?,?,?,?)";
 		try {
 			employeePayrollDataStatement = connection.prepareStatement(sql);
@@ -261,7 +286,7 @@ public class EmployeePayrollDBService {
 			} catch (SQLException exception) {
 				e.printStackTrace();
 			}
-			throw new CustomException("Unable to add the payroll details");
+			throw new CustomException("Unable to add the payroll table");
 		}
 	}
 }

@@ -17,7 +17,7 @@ public class EmployeePayrollServiceTest {
 	public void givenEmployeePayrollInDB_WhenRetrieved_ShouldMatchEmployeeCount() throws CustomException {
 		List<EmployeePayrollData> employeePayrollList = employeePayrollService
 				.readEmployeePayrollData(EmployeePayrollService.IOService.DB_IO);
-		Assert.assertEquals(5, employeePayrollList.size());
+		Assert.assertEquals(4, employeePayrollList.size());
 	}
 
 	@Test
@@ -74,24 +74,17 @@ public class EmployeePayrollServiceTest {
 	}
 
 	@Test
-	public void givenNewEmployee_WhenAdded_ShouldBeSyncWithDB() {
+	public void givenNewEmployee_whenAdded_shouldBeSyncWithDB() {
 		try {
 			employeePayrollService.readEmployeePayrollData(EmployeePayrollService.IOService.DB_IO);
-			employeePayrollService.addEmployeeToPayrollData("Mark", "M", 1500000.00, "2020-11-02");
+			Object[] depArray = { "HR", "Development" };
+			employeePayrollService.addEmployeeToPayrollData("Mark", "M", 101, "Capgemini", depArray, 4000000.00,
+					"2020-11-01");
 			boolean result = employeePayrollService.checkEmployeePayrollInSyncWithDB("Mark");
 			Assert.assertTrue(result);
+			System.out.println(result);
 		} catch (CustomException e) {
 		}
 	}
 
-	@Test
-	public void givenNewPayrollData_WhenAddedToThePayrollDetails_ShouldBeSyncWithDB() throws CustomException {
-		try {
-			employeePayrollService.readEmployeePayrollData(EmployeePayrollService.IOService.DB_IO);
-			employeePayrollService.addEmployeeToPayrollData("Akash", "M", 4000000.00, "2020-11-01");
-			boolean result = employeePayrollService.checkEmployeePayrollInSyncWithDB("Mark");
-			Assert.assertTrue(result);
-		} catch (CustomException e) {
-		}
-	}
 }

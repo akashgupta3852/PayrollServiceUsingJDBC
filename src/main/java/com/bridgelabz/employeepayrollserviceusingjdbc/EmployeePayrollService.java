@@ -81,8 +81,9 @@ public class EmployeePayrollService {
 		return employeePayrollDBService.findAvgSalaryByGender(gender);
 	}
 
-	public void addEmployeeToPayrollData(String name, String gender, Double salary, String startDate)
-			throws CustomException {
-		employeePayrollList.add(employeePayrollDBService.addEmployeeToPayrollData(name, gender, salary, startDate));
+	public void addEmployeeToPayrollData(String name, String gender, int compId, String compName, Object[] depName,
+			Double salary, String startDate) throws CustomException {
+		employeePayrollList.add(employeePayrollDBService.addEmployeeToPayrollData(name, gender, compId, compName,
+				depName, salary, startDate));
 	}
 }
